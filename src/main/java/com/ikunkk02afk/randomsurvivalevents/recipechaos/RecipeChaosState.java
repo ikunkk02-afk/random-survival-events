@@ -1,7 +1,5 @@
 package com.ikunkk02afk.randomsurvivalevents.recipechaos;
 
-import com.ikunkk02afk.randomsurvivalevents.component.PlayerEventComponent;
-import com.ikunkk02afk.randomsurvivalevents.component.RandomSurvivalEventsComponents;
 import net.minecraft.server.level.ServerPlayer;
 
 public final class RecipeChaosState {
@@ -9,11 +7,14 @@ public final class RecipeChaosState {
 	}
 
 	public static void activate(ServerPlayer player, long untilTick) {
-		RandomSurvivalEventsComponents.PLAYER_EVENTS.get(player).setRecipeChaosUntilTick(untilTick);
+		if (player == null) {
+			return;
+		}
+		long durationTicks = Math.max(0L, untilTick - player.serverLevel().getGameTime());
+		RecipeShuffleManager.startShuffle(player.serverLevel(), (int) Math.min(Integer.MAX_VALUE, durationTicks));
 	}
 
 	public static boolean isActive(ServerPlayer player) {
-		PlayerEventComponent component = RandomSurvivalEventsComponents.PLAYER_EVENTS.get(player);
-		return component.hasRecipeChaos(player.serverLevel().getGameTime());
+		return player != null && RecipeShuffleManager.isShuffleActive();
 	}
 }

@@ -1,9 +1,9 @@
 package com.ikunkk02afk.randomsurvivalevents.event.impl.recipe;
 
+import com.ikunkk02afk.randomsurvivalevents.config.RandomSurvivalEventsConfig;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventCategory;
-import com.ikunkk02afk.randomsurvivalevents.event.RandomEventUtils;
-import com.ikunkk02afk.randomsurvivalevents.recipechaos.RecipeChaosState;
+import com.ikunkk02afk.randomsurvivalevents.recipechaos.RecipeShuffleManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -29,7 +29,6 @@ public class RecipeChaosEvent implements RandomEvent {
 			return;
 		}
 
-		RecipeChaosState.activate(player, world.getGameTime() + 60L * 20L);
-		RandomEventUtils.sendMessage(player, "配方发生了奇怪的偏移。");
+		RecipeShuffleManager.startShuffle(world, RandomSurvivalEventsConfig.get().recipeShuffleDurationTicks);
 	}
 }

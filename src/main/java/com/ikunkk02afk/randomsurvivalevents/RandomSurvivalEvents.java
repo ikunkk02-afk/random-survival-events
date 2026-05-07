@@ -4,6 +4,8 @@ import net.fabricmc.api.ModInitializer;
 
 import com.ikunkk02afk.randomsurvivalevents.command.RandomSurvivalEventsCommands;
 import com.ikunkk02afk.randomsurvivalevents.config.RandomSurvivalEventsConfig;
+import com.ikunkk02afk.randomsurvivalevents.effect.ModMobEffects;
+import com.ikunkk02afk.randomsurvivalevents.event.block.BlockChaosManager;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventManager;
 import com.ikunkk02afk.randomsurvivalevents.event.EventStateTicker;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventTicker;
@@ -21,7 +23,9 @@ public class RandomSurvivalEvents implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		RandomSurvivalEventsConfig.load();
+		ModMobEffects.register();
 		RandomEventManager.initialize();
+		BlockChaosManager.register();
 		RandomEventTicker.register();
 		EventStateTicker.register();
 		RandomSurvivalEventsCommands.register();

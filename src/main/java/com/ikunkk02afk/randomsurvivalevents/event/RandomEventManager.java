@@ -15,6 +15,7 @@ import com.ikunkk02afk.randomsurvivalevents.event.impl.WeatherShiftEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.attribute.GlassCannonEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.attribute.MaxHealthBoostEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.attribute.MaxHealthReduceEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.block.BlockChaosEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.block.LuckyOreEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.block.RandomChestEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.block.SlimeFloorEvent;
@@ -54,6 +55,7 @@ public final class RandomEventManager {
 		register(new LuckyOreEvent());
 		register(new SlimeFloorEvent());
 		register(new RandomChestEvent());
+		register(new BlockChaosEvent());
 		register(new MaxHealthBoostEvent());
 		register(new MaxHealthReduceEvent());
 		register(new GlassCannonEvent());
@@ -101,7 +103,7 @@ public final class RandomEventManager {
 
 		return switch (event.getCategory()) {
 			case BLOCK -> config.enableBlockEvents && isBlockEventEnabled(event, config);
-			case RECIPE -> config.enableRecipeChaosEvents;
+			case RECIPE -> config.enableRecipeChaosEvents && config.enableGlobalRecipeShuffle;
 			case ATTRIBUTE -> config.enableAttributeEvents;
 			default -> true;
 		};
@@ -119,6 +121,9 @@ public final class RandomEventManager {
 		}
 		if (event.getId().equals("slime_floor")) {
 			return config.allowTemporaryBlockChange;
+		}
+		if (event.getId().equals("block_chaos")) {
+			return config.enableBlockChaosEffect;
 		}
 		return true;
 	}

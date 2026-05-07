@@ -18,10 +18,21 @@ public class RandomSurvivalEventsConfig {
 	public int eventIntervalTicks = 1200;
 	public boolean enableBlockEvents = true;
 	public boolean enableRecipeChaosEvents = true;
+	public boolean enableGlobalRecipeShuffle = true;
 	public boolean enableAttributeEvents = true;
 	public boolean enableDangerousEvents = true;
 	public boolean allowBlockReplacement = true;
 	public boolean allowTemporaryBlockChange = true;
+	public int recipeShuffleDurationTicks = 1000;
+	public boolean excludeOverpoweredRecipeResults = true;
+	public boolean enableBlockChaosEffect = true;
+	public int blockChaosDurationTicks = 1200;
+	public double blockChaosDropChance = 1.0D;
+	public double blockChaosMobSpawnChance = 0.35D;
+	public double blockChaosRareItemChance = 0.15D;
+	public double blockChaosDangerousMobChance = 0.15D;
+	public int blockChaosCooldownTicks = 10;
+	public boolean allowBossMobFromBlockChaos = true;
 
 	public static RandomSurvivalEventsConfig get() {
 		return instance;
@@ -69,5 +80,25 @@ public class RandomSurvivalEventsConfig {
 		if (eventIntervalTicks < 20) {
 			eventIntervalTicks = 20;
 		}
+		if (recipeShuffleDurationTicks < 20) {
+			recipeShuffleDurationTicks = 20;
+		}
+		if (blockChaosDurationTicks < 20) {
+			blockChaosDurationTicks = 20;
+		}
+		if (blockChaosCooldownTicks < 1) {
+			blockChaosCooldownTicks = 1;
+		}
+		blockChaosDropChance = sanitizeChance(blockChaosDropChance);
+		blockChaosMobSpawnChance = sanitizeChance(blockChaosMobSpawnChance);
+		blockChaosRareItemChance = sanitizeChance(blockChaosRareItemChance);
+		blockChaosDangerousMobChance = sanitizeChance(blockChaosDangerousMobChance);
+	}
+
+	private double sanitizeChance(double chance) {
+		if (Double.isNaN(chance)) {
+			return 0.0D;
+		}
+		return Math.max(0.0D, Math.min(1.0D, chance));
 	}
 }

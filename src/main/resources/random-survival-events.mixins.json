@@ -3,8 +3,10 @@
 	"package": "com.ikunkk02afk.randomsurvivalevents.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"CraftingMenuMixin",
 		"ExampleMixin",
-		"RecipeResultSlotMixin"
+		"RecipeResultSlotMixin",
+		"ResultSlotAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

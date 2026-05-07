@@ -19,7 +19,6 @@ public final class PlayerEventStateManager {
 
 			PlayerEventComponent component = RandomSurvivalEventsComponents.PLAYER_EVENTS.get(player);
 			long gameTime = player.serverLevel().getGameTime();
-			component.clearExpiredRecipeChaos(gameTime);
 			tickMaxHealthBoost(player, component, gameTime);
 			tickMaxHealthReduce(player, component, gameTime);
 			tickGlassCannon(player, component, gameTime);
