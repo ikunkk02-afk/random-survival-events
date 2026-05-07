@@ -9,15 +9,15 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 
-public class MiningLockEvent implements RandomEvent {
+public class CurseInventoryLockEvent implements RandomEvent {
 	@Override
 	public String getId() {
-		return "mining_lock";
+		return "inventory_lock";
 	}
 
 	@Override
 	public String getName() {
-		return "双手失灵";
+		return "背包封锁";
 	}
 
 	@Override
@@ -36,12 +36,17 @@ public class MiningLockEvent implements RandomEvent {
 	}
 
 	@Override
+	public boolean managesStatusEffect() {
+		return true;
+	}
+
+	@Override
 	public void execute(ServerPlayer player, ServerLevel world) {
-		if (player == null || world == null || !player.isAlive()) {
+		if (player == null || world == null || !player.isAlive() || player.isCreative()) {
 			return;
 		}
 
-		player.addEffect(new MobEffectInstance(ModMobEffects.MINING_LOCK, getDefaultEventDurationTicks(), 0, false, true, true));
-		RandomEventUtils.sendMessage(player, "你的双手突然不听使唤了。");
+		player.addEffect(new MobEffectInstance(ModMobEffects.INVENTORY_LOCK, getDefaultEventDurationTicks(), 0, false, true, true));
+		RandomEventUtils.sendMessage(player, "你的背包被一股力量封住了。");
 	}
 }

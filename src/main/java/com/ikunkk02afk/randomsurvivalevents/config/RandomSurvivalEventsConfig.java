@@ -2,6 +2,8 @@ package com.ikunkk02afk.randomsurvivalevents.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.ikunkk02afk.randomsurvivalevents.RandomSurvivalEvents;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
 import java.io.IOException;
@@ -14,17 +16,31 @@ import java.util.List;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class RandomSurvivalEventsConfig {
+	public static final int DEFAULT_EVENT_INTERVAL_TICKS = 3600;
+	public static final int DEFAULT_EVENT_DURATION_TICKS = 3400;
+	public static final int DEFAULT_GRAVITY_EVENT_DURATION_TICKS = 1000;
+	public static final boolean DEFAULT_ALLOW_EVENT_OVERLAP = false;
+	private static final int OLD_DEFAULT_EVENT_INTERVAL_TICKS = 1200;
+	private static final int OLD_DEFAULT_RECIPE_SHUFFLE_DURATION_TICKS = 1000;
+	private static final int OLD_DEFAULT_BLOCK_CHAOS_DURATION_TICKS = 1200;
+	private static final int OLD_DEFAULT_TEMPORARY_TERRAIN_RESTORE_TICKS = 400;
+	private static final int OLD_DEFAULT_LAVA_TRAP_RESTORE_TICKS = 200;
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static RandomSurvivalEventsConfig instance = new RandomSurvivalEventsConfig();
 
 	public boolean enableRandomEvents = true;
-	public int eventIntervalTicks = 1200;
+	public int eventIntervalTicks = DEFAULT_EVENT_INTERVAL_TICKS;
+	public int defaultEventDurationTicks = DEFAULT_EVENT_DURATION_TICKS;
+	public boolean allowEventOverlap = DEFAULT_ALLOW_EVENT_OVERLAP;
 	public boolean enableBlockEvents = true;
 	public boolean enableRecipeChaosEvents = true;
 	public boolean enableRecipeShuffleEvents = true;
 	public boolean enableGlobalRecipeShuffle = true;
 	public boolean enableRewardEvents = true;
 	public boolean enableNeutralEvents = true;
+	public boolean enableGravityChaos = true;
+	public boolean enableGravityCrush = true;
+	public int gravityEventDurationTicks = DEFAULT_GRAVITY_EVENT_DURATION_TICKS;
 	public boolean enableBlockChaosEvents = true;
 	public boolean enableAttributeEvents = true;
 	public boolean enableDangerousEvents = true;
@@ -36,10 +52,10 @@ public class RandomSurvivalEventsConfig {
 	public int rareEventWeight = 15;
 	public int epicEventWeight = 4;
 	public int disasterEventWeight = 1;
-	public int recipeShuffleDurationTicks = 1000;
+	public int recipeShuffleDurationTicks = DEFAULT_EVENT_DURATION_TICKS;
 	public boolean excludeOverpoweredRecipeResults = true;
 	public boolean enableBlockChaosEffect = true;
-	public int blockChaosDurationTicks = 1200;
+	public int blockChaosDurationTicks = DEFAULT_EVENT_DURATION_TICKS;
 	public double blockChaosDropChance = 1.0D;
 	public double blockChaosMobSpawnChance = 0.35D;
 	public double blockChaosRareItemChance = 0.15D;
@@ -49,16 +65,27 @@ public class RandomSurvivalEventsConfig {
 	public boolean allowDisasterBlockDamage = false;
 	public double meteorRainExplosionPower = 2.0D;
 	public boolean enablePunishmentEvents = true;
+	public boolean enableMorePunishmentEvents = true;
+	public boolean enableReverseControl = true;
+	public boolean enableItemDropCurse = true;
+	public boolean enableFoodPoison = true;
+	public boolean enableArmorRust = true;
+	public boolean enableWaterToLava = true;
+	public boolean enableRandomExplosion = true;
+	public boolean enableMobDisguise = true;
+	public boolean enableHungerCollapse = true;
+	public boolean enableInventoryLock = true;
+	public boolean enableFallingAnvil = true;
 	public int punishmentEventWeightBonus = 20;
 	public boolean allowExtremeMobs = false;
 	public boolean allowBossMobs = false;
 	public double dangerousMobChance = 0.15D;
 	public boolean allowTemporaryTerrainChange = true;
 	public boolean allowPermanentTerrainChange = false;
-	public int temporaryTerrainRestoreTicks = 400;
+	public int temporaryTerrainRestoreTicks = DEFAULT_EVENT_DURATION_TICKS;
 	public int maxTemporaryChangedBlocks = 4096;
 	public boolean allowLavaTrap = true;
-	public int lavaTrapRestoreTicks = 200;
+	public int lavaTrapRestoreTicks = DEFAULT_EVENT_DURATION_TICKS;
 	public boolean allowInventoryShuffle = true;
 	public boolean inventoryShuffleAffectsHotbar = false;
 	public boolean allowCreeperRainBlockDamage = false;
@@ -70,6 +97,10 @@ public class RandomSurvivalEventsConfig {
 	public boolean allowPermanentLavaTrap = false;
 	public boolean allowPermanentInventoryPunishment = false;
 	public boolean allowPermanentMobDisaster = false;
+	public boolean allowWaterToLavaPermanent = false;
+	public boolean allowArmorPermanentDamage = false;
+	public boolean allowFoodPermanentCorruption = false;
+	public boolean allowExplosionBlockDamage = false;
 	public List<String> toolBreakCurseProtectedItemIds = new ArrayList<>();
 
 	public static RandomSurvivalEventsConfig get() {
@@ -87,8 +118,10 @@ public class RandomSurvivalEventsConfig {
 			}
 
 			try (Reader reader = Files.newBufferedReader(path)) {
-				RandomSurvivalEventsConfig loaded = GSON.fromJson(reader, RandomSurvivalEventsConfig.class);
+				JsonObject configJson = JsonParser.parseReader(reader).getAsJsonObject();
+				RandomSurvivalEventsConfig loaded = GSON.fromJson(configJson, RandomSurvivalEventsConfig.class);
 				if (loaded != null) {
+					loaded.migrateLegacyDefaults(configJson);
 					instance = loaded;
 					instance.sanitize();
 				}
@@ -119,14 +152,95 @@ public class RandomSurvivalEventsConfig {
 		}
 	}
 
+	public int getDefaultEventDurationTicks() {
+		return Math.max(1, defaultEventDurationTicks);
+	}
+
+	public int getGravityEventDurationTicks() {
+		return Math.max(1, gravityEventDurationTicks);
+	}
+
+	public void setEventIntervalTicks(int ticks) {
+		eventIntervalTicks = Math.max(20, ticks);
+	}
+
+	public void setDefaultEventDurationTicks(int ticks) {
+		int previousDefault = defaultEventDurationTicks;
+		defaultEventDurationTicks = Math.max(20, ticks);
+		updateDurationIfFollowingDefault(previousDefault);
+	}
+
 	private static Path getConfigPath() {
 		return FabricLoader.getInstance().getConfigDir().resolve("random-survival-events.json");
+	}
+
+	private void migrateLegacyDefaults(JsonObject configJson) {
+		boolean legacyDurationSchema = !configJson.has("defaultEventDurationTicks");
+		if (!configJson.has("eventIntervalTicks")
+				|| (legacyDurationSchema && eventIntervalTicks == OLD_DEFAULT_EVENT_INTERVAL_TICKS)) {
+			eventIntervalTicks = DEFAULT_EVENT_INTERVAL_TICKS;
+		}
+		if (!configJson.has("defaultEventDurationTicks")) {
+			defaultEventDurationTicks = DEFAULT_EVENT_DURATION_TICKS;
+		}
+		if (!configJson.has("allowEventOverlap")) {
+			allowEventOverlap = DEFAULT_ALLOW_EVENT_OVERLAP;
+		}
+		if (!configJson.has("enableGravityChaos")) {
+			enableGravityChaos = true;
+		}
+		if (!configJson.has("enableGravityCrush")) {
+			enableGravityCrush = true;
+		}
+		if (!configJson.has("gravityEventDurationTicks")) {
+			gravityEventDurationTicks = DEFAULT_GRAVITY_EVENT_DURATION_TICKS;
+		}
+		if (legacyDurationSchema) {
+			if (recipeShuffleDurationTicks == OLD_DEFAULT_RECIPE_SHUFFLE_DURATION_TICKS) {
+				recipeShuffleDurationTicks = defaultEventDurationTicks;
+			}
+			if (blockChaosDurationTicks == OLD_DEFAULT_BLOCK_CHAOS_DURATION_TICKS) {
+				blockChaosDurationTicks = defaultEventDurationTicks;
+			}
+			if (temporaryTerrainRestoreTicks == OLD_DEFAULT_TEMPORARY_TERRAIN_RESTORE_TICKS) {
+				temporaryTerrainRestoreTicks = defaultEventDurationTicks;
+			}
+			if (lavaTrapRestoreTicks == OLD_DEFAULT_LAVA_TRAP_RESTORE_TICKS) {
+				lavaTrapRestoreTicks = defaultEventDurationTicks;
+			}
+		}
+	}
+
+	private void updateDurationIfFollowingDefault(int previousDefault) {
+		if (recipeShuffleDurationTicks == previousDefault
+				|| recipeShuffleDurationTicks == OLD_DEFAULT_RECIPE_SHUFFLE_DURATION_TICKS) {
+			recipeShuffleDurationTicks = defaultEventDurationTicks;
+		}
+		if (blockChaosDurationTicks == previousDefault
+				|| blockChaosDurationTicks == OLD_DEFAULT_BLOCK_CHAOS_DURATION_TICKS) {
+			blockChaosDurationTicks = defaultEventDurationTicks;
+		}
+		if (temporaryTerrainRestoreTicks == previousDefault
+				|| temporaryTerrainRestoreTicks == OLD_DEFAULT_TEMPORARY_TERRAIN_RESTORE_TICKS) {
+			temporaryTerrainRestoreTicks = defaultEventDurationTicks;
+		}
+		if (lavaTrapRestoreTicks == previousDefault
+				|| lavaTrapRestoreTicks == OLD_DEFAULT_LAVA_TRAP_RESTORE_TICKS) {
+			lavaTrapRestoreTicks = defaultEventDurationTicks;
+		}
 	}
 
 	private void sanitize() {
 		if (eventIntervalTicks < 20) {
 			eventIntervalTicks = 20;
 		}
+		if (defaultEventDurationTicks < 20) {
+			defaultEventDurationTicks = 20;
+		}
+		if (gravityEventDurationTicks < 20) {
+			gravityEventDurationTicks = DEFAULT_GRAVITY_EVENT_DURATION_TICKS;
+		}
+		updateDurationIfFollowingDefault(DEFAULT_EVENT_DURATION_TICKS);
 		if (recipeShuffleDurationTicks < 20) {
 			recipeShuffleDurationTicks = 20;
 		}

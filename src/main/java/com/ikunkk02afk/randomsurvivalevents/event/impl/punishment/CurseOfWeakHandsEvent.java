@@ -11,8 +11,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 
 public class CurseOfWeakHandsEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 45 * 20;
-
 	@Override
 	public String getId() {
 		return "curse_of_weak_hands";
@@ -35,7 +33,7 @@ public class CurseOfWeakHandsEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -49,9 +47,10 @@ public class CurseOfWeakHandsEvent implements RandomEvent {
 			return;
 		}
 
-		player.addEffect(new MobEffectInstance(ModMobEffects.WEAK_HANDS, DURATION_TICKS, 0, false, true, true));
-		player.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, DURATION_TICKS, 4));
-		player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, DURATION_TICKS, 1));
+		int durationTicks = getDefaultEventDurationTicks();
+		player.addEffect(new MobEffectInstance(ModMobEffects.WEAK_HANDS, durationTicks, 0, false, true, true));
+		player.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, durationTicks, 4));
+		player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, durationTicks, 1));
 		RandomEventUtils.sendMessage(player, "废手诅咒缠住了你的双手。");
 	}
 }

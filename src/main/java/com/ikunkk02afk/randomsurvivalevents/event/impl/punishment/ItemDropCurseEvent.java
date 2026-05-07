@@ -9,15 +9,15 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 
-public class MiningLockEvent implements RandomEvent {
+public class ItemDropCurseEvent implements RandomEvent {
 	@Override
 	public String getId() {
-		return "mining_lock";
+		return "item_drop_curse";
 	}
 
 	@Override
 	public String getName() {
-		return "双手失灵";
+		return "手滑诅咒";
 	}
 
 	@Override
@@ -36,12 +36,17 @@ public class MiningLockEvent implements RandomEvent {
 	}
 
 	@Override
+	public boolean managesStatusEffect() {
+		return true;
+	}
+
+	@Override
 	public void execute(ServerPlayer player, ServerLevel world) {
 		if (player == null || world == null || !player.isAlive()) {
 			return;
 		}
 
-		player.addEffect(new MobEffectInstance(ModMobEffects.MINING_LOCK, getDefaultEventDurationTicks(), 0, false, true, true));
-		RandomEventUtils.sendMessage(player, "你的双手突然不听使唤了。");
+		player.addEffect(new MobEffectInstance(ModMobEffects.ITEM_DROP_CURSE, getDefaultEventDurationTicks(), 0, false, true, true));
+		RandomEventUtils.sendMessage(player, "你的背包好像漏了。");
 	}
 }

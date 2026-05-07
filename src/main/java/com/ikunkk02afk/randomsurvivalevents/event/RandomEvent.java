@@ -1,6 +1,7 @@
 package com.ikunkk02afk.randomsurvivalevents.event;
 
 import com.ikunkk02afk.randomsurvivalevents.RandomSurvivalEvents;
+import com.ikunkk02afk.randomsurvivalevents.config.RandomSurvivalEventsConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,6 +25,10 @@ public interface RandomEvent {
 
 	default int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
 		return DEFAULT_DISPLAY_EFFECT_DURATION_TICKS;
+	}
+
+	default int getDefaultEventDurationTicks() {
+		return RandomSurvivalEventsConfig.get().getDefaultEventDurationTicks();
 	}
 
 	default boolean managesStatusEffect() {

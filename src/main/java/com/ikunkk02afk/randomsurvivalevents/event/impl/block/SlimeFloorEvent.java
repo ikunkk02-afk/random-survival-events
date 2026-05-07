@@ -13,8 +13,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SlimeFloorEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 60 * 20;
-
 	@Override
 	public String getId() {
 		return "slime_floor";
@@ -37,7 +35,7 @@ public class SlimeFloorEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -47,6 +45,7 @@ public class SlimeFloorEvent implements RandomEvent {
 		}
 
 		BlockPos center = player.blockPosition().below();
+		int durationTicks = getDefaultEventDurationTicks();
 		int changed = 0;
 		for (int dx = -1; dx <= 1; dx++) {
 			for (int dz = -1; dz <= 1; dz++) {
@@ -57,7 +56,7 @@ public class SlimeFloorEvent implements RandomEvent {
 				}
 
 				world.setBlockAndUpdate(pos, Blocks.SLIME_BLOCK.defaultBlockState());
-				TemporaryBlockChangeManager.add(world, pos, originalState, world.getGameTime() + DURATION_TICKS);
+				TemporaryBlockChangeManager.add(world, pos, originalState, world.getGameTime() + durationTicks);
 				changed++;
 			}
 		}

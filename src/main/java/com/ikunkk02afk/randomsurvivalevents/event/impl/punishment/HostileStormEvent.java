@@ -60,7 +60,7 @@ public class HostileStormEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return 20 * 20;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override

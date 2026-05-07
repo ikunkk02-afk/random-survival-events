@@ -1,6 +1,8 @@
 package com.ikunkk02afk.randomsurvivalevents.event;
 
 import com.ikunkk02afk.randomsurvivalevents.RandomSurvivalEvents;
+import com.ikunkk02afk.randomsurvivalevents.component.PlayerEventComponent;
+import com.ikunkk02afk.randomsurvivalevents.component.RandomSurvivalEventsComponents;
 import com.ikunkk02afk.randomsurvivalevents.config.RandomSurvivalEventsConfig;
 import com.ikunkk02afk.randomsurvivalevents.effect.ModMobEffects;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.AirDropEvent;
@@ -23,26 +25,37 @@ import com.ikunkk02afk.randomsurvivalevents.event.impl.block.SlimeFloorEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.disaster.MeteorRainEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.BlindHuntEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.BedrockPrisonEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.ArmorRustEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.CreeperRainEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.CurseInventoryLockEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.CurseOfWeakHandsEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.FakeChunkVoidEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.FallingAnvilEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.FoodPoisonEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.GravityCrushEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.HealthDebtEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.HungerCollapseEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.HostileStormEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.ItemDropCurseEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.InventoryTaxEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.InventoryPanicEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.LavaCorruptionEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.LavaUnderfootEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.MiningLockEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.MobDisguiseEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.MonsterAmbushEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.PermanentChunkCollapseEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.RandomExplosionEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.RandomTeleportTrapEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.ReverseControlEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.ToolBreakCurseEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.VoidCrackEvent;
+import com.ikunkk02afk.randomsurvivalevents.event.impl.punishment.WaterToLavaEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.recipe.RecipeChaosEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.special.BerserkEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.special.GlowingMobsEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.impl.special.GravityChaosEvent;
+import com.ikunkk02afk.randomsurvivalevents.recipechaos.RecipeShuffleManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +63,7 @@ import java.util.Optional;
 import java.util.Random;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public final class RandomEventManager {
 	private static final List<RandomEvent> EVENTS = new ArrayList<>();
@@ -103,6 +117,16 @@ public final class RandomEventManager {
 		register(new HostileStormEvent());
 		register(new VoidCrackEvent());
 		register(new CurseOfWeakHandsEvent());
+		register(new ReverseControlEvent());
+		register(new ItemDropCurseEvent());
+		register(new FoodPoisonEvent());
+		register(new ArmorRustEvent());
+		register(new WaterToLavaEvent());
+		register(new RandomExplosionEvent());
+		register(new MobDisguiseEvent());
+		register(new HungerCollapseEvent());
+		register(new CurseInventoryLockEvent());
+		register(new FallingAnvilEvent());
 
 		RandomSurvivalEvents.LOGGER.info("Registered {} random survival events.", EVENTS.size());
 	}
@@ -134,6 +158,15 @@ public final class RandomEventManager {
 			return false;
 		}
 		if (!isEnabled(event)) {
+			return false;
+		}
+		if (shouldSkipForActiveEventState(player, world, event)) {
+			RandomEventUtils.sendMessage(player, "随机事件正在持续，新的事件被跳过了。");
+			RandomSurvivalEvents.LOGGER.info(
+					"[Random Survival Events] Skipped event {} for player {} because another event state is active.",
+					event.getId(),
+					player.getGameProfile().getName()
+			);
 			return false;
 		}
 		if (!canExecuteEvent(player, event)) {
@@ -254,9 +287,45 @@ public final class RandomEventManager {
 		return player != null && player.isAlive() && !player.isCreative() && !player.isSpectator();
 	}
 
+	private static boolean shouldSkipForActiveEventState(ServerPlayer player, ServerLevel world, RandomEvent event) {
+		RandomSurvivalEventsConfig config = RandomSurvivalEventsConfig.get();
+		return !config.allowEventOverlap
+				&& isDurationBasedEvent(player, world, event)
+				&& hasActiveRandomEventState(player, world);
+	}
+
+	private static boolean isDurationBasedEvent(ServerPlayer player, ServerLevel world, RandomEvent event) {
+		return event.managesStatusEffect()
+				|| event.getStatusEffectDurationTicks(player, world) > RandomEvent.DEFAULT_DISPLAY_EFFECT_DURATION_TICKS
+				|| event.getCategory() == RandomEventCategory.ATTRIBUTE
+				|| event.getCategory() == RandomEventCategory.RECIPE;
+	}
+
+	private static boolean hasActiveRandomEventState(ServerPlayer player, ServerLevel world) {
+		for (MobEffectInstance effect : player.getActiveEffects()) {
+			if (effect.getDuration() > 0 && ModMobEffects.getEffectPath(effect.getEffect()).isPresent()) {
+				return true;
+			}
+		}
+
+		long gameTime = world.getGameTime();
+		PlayerEventComponent component = RandomSurvivalEventsComponents.PLAYER_EVENTS.get(player);
+		if (component.getMaxHealthBoostUntilTick() > gameTime
+				|| component.getMaxHealthReduceUntilTick() > gameTime
+				|| component.getGlassCannonUntilTick() > gameTime
+				|| component.getHealthDebtUntilTick() > gameTime) {
+			return true;
+		}
+
+		return RecipeShuffleManager.isShuffleActive();
+	}
+
 	private static boolean isEnabled(RandomEvent event) {
 		RandomSurvivalEventsConfig config = RandomSurvivalEventsConfig.get();
 		if (!config.enableRandomEvents) {
+			return false;
+		}
+		if (event.getId().equals("gravity_chaos") && !config.enableGravityChaos) {
 			return false;
 		}
 
@@ -305,6 +374,7 @@ public final class RandomEventManager {
 	private static boolean isPunishmentEventEnabled(RandomEvent event, RandomSurvivalEventsConfig config) {
 		return switch (event.getId()) {
 			case "fake_chunk_void" -> config.allowTemporaryTerrainChange;
+			case "gravity_crush" -> config.enableGravityCrush;
 			case "lava_underfoot" -> config.allowLavaTrap;
 			case "inventory_panic" -> config.allowInventoryShuffle;
 			case "creeper_rain" -> config.creeperRainCountMax > 0;
@@ -312,6 +382,18 @@ public final class RandomEventManager {
 			case "lava_corruption" -> config.allowTemporaryTerrainChange || canPermanentlyDamageLava(config);
 			case "inventory_tax" -> config.allowInventoryShuffle || canPermanentlyPunishInventory(config);
 			case "void_crack" -> config.allowTemporaryTerrainChange || canPermanentlyDamageChunk(config);
+			case "reverse_control" -> config.enableMorePunishmentEvents && config.enableReverseControl;
+			case "item_drop_curse" -> config.enableMorePunishmentEvents && config.enableItemDropCurse;
+			case "food_poison" -> config.enableMorePunishmentEvents && config.enableFoodPoison;
+			case "armor_rust" -> config.enableMorePunishmentEvents && config.enableArmorRust;
+			case "water_to_lava" -> config.enableMorePunishmentEvents
+					&& config.enableWaterToLava
+					&& (config.allowTemporaryTerrainChange || canPermanentlyReplaceWaterWithLava(config));
+			case "random_explosion" -> config.enableMorePunishmentEvents && config.enableRandomExplosion;
+			case "mob_disguise" -> config.enableMorePunishmentEvents && config.enableMobDisguise;
+			case "hunger_collapse" -> config.enableMorePunishmentEvents && config.enableHungerCollapse;
+			case "inventory_lock" -> config.enableMorePunishmentEvents && config.enableInventoryLock;
+			case "falling_anvil" -> config.enableMorePunishmentEvents && config.enableFallingAnvil;
 			default -> true;
 		};
 	}
@@ -373,5 +455,12 @@ public final class RandomEventManager {
 
 	private static boolean canPermanentlyPunishInventory(RandomSurvivalEventsConfig config) {
 		return config.destructiveMode && config.enablePermanentPunishmentEvents && config.allowPermanentInventoryPunishment;
+	}
+
+	private static boolean canPermanentlyReplaceWaterWithLava(RandomSurvivalEventsConfig config) {
+		return config.destructiveMode
+				&& config.enablePermanentPunishmentEvents
+				&& config.allowPermanentTerrainChange
+				&& config.allowWaterToLavaPermanent;
 	}
 }

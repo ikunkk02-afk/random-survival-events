@@ -19,7 +19,6 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.monster.Creeper;
 
 public class BlindHuntEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 25 * 20;
 	private static final Random RANDOM = new Random();
 	private static final List<EntityType<? extends Mob>> HUNTERS = List.of(
 			EntityType.ZOMBIE,
@@ -51,7 +50,7 @@ public class BlindHuntEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -60,7 +59,7 @@ public class BlindHuntEvent implements RandomEvent {
 			return;
 		}
 
-		player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, DURATION_TICKS, 0));
+		player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, getDefaultEventDurationTicks(), 0));
 		int count = RandomEventUtils.randomBetween(2, 4);
 		int spawned = 0;
 		for (int i = 0; i < count; i++) {

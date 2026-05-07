@@ -10,8 +10,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 
 public class SweatyEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 15 * 20;
-
 	@Override
 	public String getId() {
 		return "sweaty";
@@ -34,7 +32,7 @@ public class SweatyEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -43,8 +41,9 @@ public class SweatyEvent implements RandomEvent {
 			return;
 		}
 
-		player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, DURATION_TICKS, 0));
-		player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 10 * 20, 0));
+		int durationTicks = getDefaultEventDurationTicks();
+		player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, durationTicks, 0));
+		player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, durationTicks, 0));
 		RandomEventUtils.sendMessage(player, "你突然感觉汗流浃背了。");
 	}
 }

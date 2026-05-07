@@ -12,8 +12,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 public class MaxHealthBoostEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 180 * 20;
-
 	@Override
 	public String getId() {
 		return "max_health_boost";
@@ -36,7 +34,7 @@ public class MaxHealthBoostEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -46,7 +44,7 @@ public class MaxHealthBoostEvent implements RandomEvent {
 		}
 
 		PlayerEventComponent component = RandomSurvivalEventsComponents.PLAYER_EVENTS.get(player);
-		component.setMaxHealthBoostUntilTick(world.getGameTime() + DURATION_TICKS);
+		component.setMaxHealthBoostUntilTick(world.getGameTime() + getDefaultEventDurationTicks());
 		AttributeEventHelper.applyMaxHealthModifier(player, AttributeEventIds.MAX_HEALTH_BOOST, 4.0D);
 		player.heal(4.0F);
 		RandomEventUtils.sendMessage(player, "你的最大生命值暂时提高了。");

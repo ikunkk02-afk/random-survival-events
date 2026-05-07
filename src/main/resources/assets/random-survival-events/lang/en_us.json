@@ -34,5 +34,8 @@
   "effect.random-survival-events.lava_corruption": "Lava Corruption",
   "effect.random-survival-events.void_crack": "Void Crack",
   "effect.random-survival-events.block_chaos": "Block Chaos",
-  "effect.random-survival-events.recipe_chaos": "Recipe Chaos"
+  "effect.random-survival-events.recipe_chaos": "Recipe Chaos",
+  "effect.random-survival-events.reverse_control": "Reverse Control",
+  "effect.random-survival-events.item_drop_curse": "Item Drop Curse",
+  "effect.random-survival-events.inventory_lock": "Inventory Lock"
 }

@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 public class BedrockPrisonEvent implements RandomEvent {
-	private static final int TEMPORARY_DURATION_TICKS = 10 * 20;
 	private static final Random RANDOM = new Random();
 
 	@Override
@@ -52,7 +51,7 @@ public class BedrockPrisonEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return TEMPORARY_DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -72,7 +71,8 @@ public class BedrockPrisonEvent implements RandomEvent {
 			return;
 		}
 
-		long expireTick = world.getGameTime() + TEMPORARY_DURATION_TICKS;
+		int durationTicks = getDefaultEventDurationTicks();
+		long expireTick = world.getGameTime() + durationTicks;
 		int placed = 0;
 		int permanent = 0;
 		BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
@@ -94,7 +94,7 @@ public class BedrockPrisonEvent implements RandomEvent {
 		if (placed <= 0) {
 			RandomEventUtils.sendMessage(player, "基岩牢笼没有找到可放置位置。");
 		} else {
-			RandomEventUtils.sendMessage(player, permanent > 0 ? "基岩牢笼落下，一部分基岩将永久保留。" : "基岩牢笼落下，10 秒后会恢复。");
+			RandomEventUtils.sendMessage(player, permanent > 0 ? "基岩牢笼落下，一部分基岩将永久保留。" : "基岩牢笼落下，稍后会恢复。");
 		}
 	}
 

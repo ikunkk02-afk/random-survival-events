@@ -15,7 +15,6 @@ import net.minecraft.world.item.Items;
 
 public class LuckyBlessingEvent implements RandomEvent {
 	private static final Random RANDOM = new Random();
-	private static final int DURATION_TICKS = 20 * 20;
 	private static final Item[] REWARDS = {
 			Items.GOLD_NUGGET,
 			Items.EXPERIENCE_BOTTLE,
@@ -45,7 +44,7 @@ public class LuckyBlessingEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -54,7 +53,7 @@ public class LuckyBlessingEvent implements RandomEvent {
 			return;
 		}
 
-		player.addEffect(new MobEffectInstance(MobEffects.LUCK, DURATION_TICKS, 0));
+		player.addEffect(new MobEffectInstance(MobEffects.LUCK, getDefaultEventDurationTicks(), 0));
 		Item reward = REWARDS[RANDOM.nextInt(REWARDS.length)];
 		RandomEventUtils.dropItem(world, player.blockPosition(), new ItemStack(reward, getRewardCount(reward)));
 		RandomEventUtils.sendMessage(player, "你感觉今天的运气有点离谱。");

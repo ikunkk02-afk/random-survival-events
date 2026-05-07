@@ -12,8 +12,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 public class MaxHealthReduceEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 120 * 20;
-
 	@Override
 	public String getId() {
 		return "max_health_reduce";
@@ -36,7 +34,7 @@ public class MaxHealthReduceEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -46,7 +44,7 @@ public class MaxHealthReduceEvent implements RandomEvent {
 		}
 
 		PlayerEventComponent component = RandomSurvivalEventsComponents.PLAYER_EVENTS.get(player);
-		component.setMaxHealthReduceUntilTick(world.getGameTime() + DURATION_TICKS);
+		component.setMaxHealthReduceUntilTick(world.getGameTime() + getDefaultEventDurationTicks());
 		AttributeEventHelper.applyMaxHealthModifier(player, AttributeEventIds.MAX_HEALTH_REDUCE, -4.0D);
 		RandomEventUtils.sendMessage(player, "你的最大生命值被暂时压低了。");
 	}

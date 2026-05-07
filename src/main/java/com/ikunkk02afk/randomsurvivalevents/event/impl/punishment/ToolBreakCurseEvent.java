@@ -46,7 +46,7 @@ public class ToolBreakCurseEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return 20 * 20;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -66,8 +66,9 @@ public class ToolBreakCurseEvent implements RandomEvent {
 			return;
 		}
 		if (!config.destructiveMode) {
-			player.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 15 * 20, 3));
-			player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 15 * 20, 0));
+			int durationTicks = getDefaultEventDurationTicks();
+			player.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, durationTicks, 3));
+			player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, durationTicks, 0));
 			RandomEventUtils.sendMessage(player, "破碎诅咒擦过主手工具，毁灭模式关闭阻止了永久耐久损伤。");
 			return;
 		}

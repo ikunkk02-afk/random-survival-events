@@ -14,8 +14,6 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.phys.AABB;
 
 public class GlowingMobsEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 20 * 20;
-
 	@Override
 	public String getId() {
 		return "glowing_mobs";
@@ -38,7 +36,7 @@ public class GlowingMobsEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -48,9 +46,10 @@ public class GlowingMobsEvent implements RandomEvent {
 		}
 
 		AABB box = player.getBoundingBox().inflate(16.0D);
+		int durationTicks = getDefaultEventDurationTicks();
 		int affected = 0;
 		for (Entity entity : world.getEntities(player, box, entity -> entity instanceof LivingEntity && entity instanceof Enemy)) {
-			((LivingEntity) entity).addEffect(new MobEffectInstance(MobEffects.GLOWING, DURATION_TICKS, 0));
+			((LivingEntity) entity).addEffect(new MobEffectInstance(MobEffects.GLOWING, durationTicks, 0));
 			affected++;
 		}
 

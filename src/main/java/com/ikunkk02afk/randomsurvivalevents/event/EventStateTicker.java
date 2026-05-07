@@ -2,6 +2,8 @@ package com.ikunkk02afk.randomsurvivalevents.event;
 
 import com.ikunkk02afk.randomsurvivalevents.event.block.BlockChaosManager;
 import com.ikunkk02afk.randomsurvivalevents.event.block.TemporaryBlockChangeManager;
+import com.ikunkk02afk.randomsurvivalevents.event.gravity.GravityEventManager;
+import com.ikunkk02afk.randomsurvivalevents.event.punishment.MorePunishmentEventManager;
 import com.ikunkk02afk.randomsurvivalevents.event.state.PlayerEventStateManager;
 import com.ikunkk02afk.randomsurvivalevents.recipechaos.RecipeShuffleManager;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -23,6 +25,8 @@ public final class EventStateTicker {
 			TemporaryBlockChangeManager.tick(server);
 			BlockChaosManager.tick(server);
 			RecipeShuffleManager.tick(server);
+			MorePunishmentEventManager.tick(server);
+			GravityEventManager.tick(server);
 		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(TemporaryBlockChangeManager::restoreAll);
 		registered = true;

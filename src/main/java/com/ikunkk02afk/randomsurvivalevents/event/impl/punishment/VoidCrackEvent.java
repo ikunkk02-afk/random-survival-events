@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class VoidCrackEvent implements RandomEvent {
-	private static final int TEMPORARY_DURATION_TICKS = 15 * 20;
 	private static final Random RANDOM = new Random();
 
 	@Override
@@ -51,7 +50,7 @@ public class VoidCrackEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return TEMPORARY_DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -74,7 +73,7 @@ public class VoidCrackEvent implements RandomEvent {
 		}
 
 		BlockState air = Blocks.AIR.defaultBlockState();
-		long expireTick = world.getGameTime() + TEMPORARY_DURATION_TICKS;
+		long expireTick = world.getGameTime() + getDefaultEventDurationTicks();
 		int changed = 0;
 		for (BlockPos start : starts) {
 			int depth = RandomEventUtils.randomBetween(1, 3);

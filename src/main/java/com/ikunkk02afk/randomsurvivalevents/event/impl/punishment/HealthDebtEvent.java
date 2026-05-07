@@ -14,9 +14,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 
 public class HealthDebtEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 60 * 20;
-	private static final int WEAKNESS_TICKS = 10 * 20;
-
 	@Override
 	public String getId() {
 		return "health_debt";
@@ -39,7 +36,7 @@ public class HealthDebtEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -49,9 +46,10 @@ public class HealthDebtEvent implements RandomEvent {
 		}
 
 		PlayerEventComponent component = RandomSurvivalEventsComponents.PLAYER_EVENTS.get(player);
-		component.setHealthDebtUntilTick(world.getGameTime() + DURATION_TICKS);
+		int durationTicks = getDefaultEventDurationTicks();
+		component.setHealthDebtUntilTick(world.getGameTime() + durationTicks);
 		AttributeEventHelper.applyMaxHealthModifier(player, AttributeEventIds.HEALTH_DEBT, -6.0D);
-		player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, WEAKNESS_TICKS, 0));
+		player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, durationTicks, 0));
 		RandomEventUtils.sendMessage(player, "你的生命力被短暂抽走了。");
 	}
 }

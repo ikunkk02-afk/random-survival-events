@@ -10,6 +10,8 @@ import com.ikunkk02afk.randomsurvivalevents.event.RandomEventManager;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventTicker;
 import com.ikunkk02afk.randomsurvivalevents.recipechaos.RecipeShuffleManager;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.ArrayList;
@@ -54,7 +56,26 @@ public final class RandomSurvivalEventsCommands {
 								.then(Commands.literal("reload")
 										.executes(context -> reloadConfig(context.getSource())))
 								.then(Commands.literal("show")
-										.executes(context -> showConfig(context.getSource()))))
+										.executes(context -> showConfig(context.getSource())))
+								.then(Commands.literal("set")
+										.then(Commands.literal("interval")
+												.then(Commands.argument("ticks", IntegerArgumentType.integer(20))
+														.executes(context -> setEventInterval(
+																context.getSource(),
+																IntegerArgumentType.getInteger(context, "ticks")
+														))))
+										.then(Commands.literal("duration")
+												.then(Commands.argument("ticks", IntegerArgumentType.integer(20))
+														.executes(context -> setDefaultEventDuration(
+																context.getSource(),
+																IntegerArgumentType.getInteger(context, "ticks")
+														))))
+										.then(Commands.literal("overlap")
+												.then(Commands.argument("value", BoolArgumentType.bool())
+														.executes(context -> setEventOverlap(
+																context.getSource(),
+																BoolArgumentType.getBool(context, "value")
+														))))))
 						.then(Commands.literal("trigger_punishment")
 								.executes(context -> triggerRandomPunishmentEvent(context.getSource())))
 						.then(Commands.literal("trigger_rarity")
@@ -151,6 +172,10 @@ public final class RandomSurvivalEventsCommands {
 		config.allowPermanentInventoryPunishment = enabled;
 		config.allowPermanentMobDisaster = enabled;
 		config.allowPermanentTerrainChange = enabled;
+		config.allowWaterToLavaPermanent = enabled;
+		config.allowArmorPermanentDamage = enabled;
+		config.allowFoodPermanentCorruption = enabled;
+		config.allowExplosionBlockDamage = enabled;
 		RandomSurvivalEventsConfig.save();
 
 		if (enabled) {
@@ -173,9 +198,14 @@ public final class RandomSurvivalEventsCommands {
 		source.sendSuccess(() -> Component.literal("RSE key config:"), false);
 		source.sendSuccess(() -> Component.literal("- enableRandomEvents: " + config.enableRandomEvents), false);
 		source.sendSuccess(() -> Component.literal("- eventIntervalTicks: " + config.eventIntervalTicks), false);
+		source.sendSuccess(() -> Component.literal("- defaultEventDurationTicks: " + config.defaultEventDurationTicks), false);
+		source.sendSuccess(() -> Component.literal("- gravityEventDurationTicks: " + config.gravityEventDurationTicks), false);
+		source.sendSuccess(() -> Component.literal("- allowEventOverlap: " + config.allowEventOverlap), false);
 		source.sendSuccess(() -> Component.literal("- enablePunishmentEvents: " + config.enablePunishmentEvents), false);
 		source.sendSuccess(() -> Component.literal("- enableRewardEvents: " + config.enableRewardEvents), false);
 		source.sendSuccess(() -> Component.literal("- enableNeutralEvents: " + config.enableNeutralEvents), false);
+		source.sendSuccess(() -> Component.literal("- enableGravityChaos: " + config.enableGravityChaos), false);
+		source.sendSuccess(() -> Component.literal("- enableGravityCrush: " + config.enableGravityCrush), false);
 		source.sendSuccess(() -> Component.literal("- enableRecipeShuffleEvents: " + config.enableRecipeShuffleEvents), false);
 		source.sendSuccess(() -> Component.literal("- enableGlobalRecipeShuffle: " + config.enableGlobalRecipeShuffle), false);
 		source.sendSuccess(() -> Component.literal("- enableBlockChaosEvents: " + config.enableBlockChaosEvents), false);
@@ -184,8 +214,36 @@ public final class RandomSurvivalEventsCommands {
 		source.sendSuccess(() -> Component.literal("- destructiveMode: " + config.destructiveMode), false);
 		source.sendSuccess(() -> Component.literal("- enablePermanentPunishmentEvents: " + config.enablePermanentPunishmentEvents), false);
 		source.sendSuccess(() -> Component.literal("- allowPermanentTerrainChange: " + config.allowPermanentTerrainChange), false);
+		source.sendSuccess(() -> Component.literal("- allowWaterToLavaPermanent: " + config.allowWaterToLavaPermanent), false);
+		source.sendSuccess(() -> Component.literal("- allowArmorPermanentDamage: " + config.allowArmorPermanentDamage), false);
+		source.sendSuccess(() -> Component.literal("- allowFoodPermanentCorruption: " + config.allowFoodPermanentCorruption), false);
+		source.sendSuccess(() -> Component.literal("- allowExplosionBlockDamage: " + config.allowExplosionBlockDamage), false);
 		source.sendSuccess(() -> Component.literal("- allowBossMobs: " + config.allowBossMobs), false);
 		source.sendSuccess(() -> Component.literal("- allowExtremeMobs: " + config.allowExtremeMobs), false);
+		return 1;
+	}
+
+	private static int setEventInterval(CommandSourceStack source, int ticks) {
+		RandomSurvivalEventsConfig config = RandomSurvivalEventsConfig.get();
+		config.setEventIntervalTicks(ticks);
+		RandomSurvivalEventsConfig.save();
+		source.sendSuccess(() -> Component.literal("RSE eventIntervalTicks set to " + config.eventIntervalTicks + " and saved."), true);
+		return 1;
+	}
+
+	private static int setDefaultEventDuration(CommandSourceStack source, int ticks) {
+		RandomSurvivalEventsConfig config = RandomSurvivalEventsConfig.get();
+		config.setDefaultEventDurationTicks(ticks);
+		RandomSurvivalEventsConfig.save();
+		source.sendSuccess(() -> Component.literal("RSE defaultEventDurationTicks set to " + config.defaultEventDurationTicks + " and saved."), true);
+		return 1;
+	}
+
+	private static int setEventOverlap(CommandSourceStack source, boolean allowOverlap) {
+		RandomSurvivalEventsConfig config = RandomSurvivalEventsConfig.get();
+		config.allowEventOverlap = allowOverlap;
+		RandomSurvivalEventsConfig.save();
+		source.sendSuccess(() -> Component.literal("RSE allowEventOverlap set to " + config.allowEventOverlap + " and saved."), true);
 		return 1;
 	}
 
@@ -262,10 +320,11 @@ public final class RandomSurvivalEventsCommands {
 			return 0;
 		}
 
+		int durationTicks = RandomSurvivalEventsConfig.get().getDefaultEventDurationTicks();
 		return ModMobEffects.getDisplayEffect(effectId).map(effect -> {
-			ModMobEffects.refreshEffect(player, effect, 60 * 20);
-			applyLinkedEffectBehavior(player, effectId, 60 * 20);
-			source.sendSuccess(() -> Component.literal("Applied RSE effect " + effectId + " for 60 seconds."), false);
+			ModMobEffects.refreshEffect(player, effect, durationTicks);
+			applyLinkedEffectBehavior(player, effectId, durationTicks);
+			source.sendSuccess(() -> Component.literal("Applied RSE effect " + effectId + " for " + ticksToSeconds(durationTicks) + " seconds."), false);
 			RandomSurvivalEvents.LOGGER.info(
 					"[Random Survival Events] Debug RSE effect {} applied to player {}",
 					effectId,

@@ -24,6 +24,28 @@ public final class DestructiveModeRules {
 		return config.destructiveMode && config.enablePermanentPunishmentEvents && config.allowPermanentInventoryPunishment;
 	}
 
+	public static boolean canPermanentlyReplaceWaterWithLava(RandomSurvivalEventsConfig config) {
+		return config.destructiveMode
+				&& config.enablePermanentPunishmentEvents
+				&& config.allowPermanentTerrainChange
+				&& config.allowWaterToLavaPermanent;
+	}
+
+	public static boolean canPermanentlyDamageArmor(RandomSurvivalEventsConfig config) {
+		return config.destructiveMode && config.enablePermanentPunishmentEvents && config.allowArmorPermanentDamage;
+	}
+
+	public static boolean canPermanentlyCorruptFood(RandomSurvivalEventsConfig config) {
+		return config.destructiveMode && config.enablePermanentPunishmentEvents && config.allowFoodPermanentCorruption;
+	}
+
+	public static boolean canDamageExplosionBlocks(RandomSurvivalEventsConfig config) {
+		return config.destructiveMode
+				&& config.enablePermanentPunishmentEvents
+				&& config.allowPermanentTerrainChange
+				&& config.allowExplosionBlockDamage;
+	}
+
 	public static boolean canUsePermanentMobDisaster(RandomSurvivalEventsConfig config) {
 		return config.destructiveMode && config.enablePermanentPunishmentEvents && config.allowPermanentMobDisaster;
 	}

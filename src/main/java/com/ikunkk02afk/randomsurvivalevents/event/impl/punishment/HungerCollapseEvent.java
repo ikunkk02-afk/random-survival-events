@@ -1,6 +1,5 @@
 package com.ikunkk02afk.randomsurvivalevents.event.impl.punishment;
 
-import com.ikunkk02afk.randomsurvivalevents.effect.ModMobEffects;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventCategory;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
@@ -8,16 +7,18 @@ import com.ikunkk02afk.randomsurvivalevents.event.RandomEventUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.food.FoodData;
 
-public class MiningLockEvent implements RandomEvent {
+public class HungerCollapseEvent implements RandomEvent {
 	@Override
 	public String getId() {
-		return "mining_lock";
+		return "hunger_collapse";
 	}
 
 	@Override
 	public String getName() {
-		return "双手失灵";
+		return "体力崩溃";
 	}
 
 	@Override
@@ -41,7 +42,12 @@ public class MiningLockEvent implements RandomEvent {
 			return;
 		}
 
-		player.addEffect(new MobEffectInstance(ModMobEffects.MINING_LOCK, getDefaultEventDurationTicks(), 0, false, true, true));
-		RandomEventUtils.sendMessage(player, "你的双手突然不听使唤了。");
+		FoodData foodData = player.getFoodData();
+		foodData.setFoodLevel(Math.max(1, foodData.getFoodLevel() - RandomEventUtils.randomBetween(6, 10)));
+		foodData.setSaturation(0.0F);
+		int durationTicks = getDefaultEventDurationTicks();
+		player.addEffect(new MobEffectInstance(MobEffects.HUNGER, durationTicks, 1));
+		player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, durationTicks, 0));
+		RandomEventUtils.sendMessage(player, "你的体力突然被抽空了。");
 	}
 }

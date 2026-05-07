@@ -41,7 +41,7 @@ public final class ModMobEffects {
 	public static final Holder.Reference<MobEffect> MONSTER_AMBUSH = registerDisplayOnly("monster_ambush", 0x8E2A2A);
 	public static final Holder.Reference<MobEffect> FAKE_CHUNK_VOID = registerDisplayOnly("fake_chunk_void", 0x1E1B26);
 	public static final Holder.Reference<MobEffect> LAVA_UNDERFOOT = registerDisplayOnly("lava_underfoot", 0xF36A22);
-	public static final Holder.Reference<MobEffect> GRAVITY_CRUSH = registerDisplayOnly("gravity_crush", 0x56515F);
+	public static final Holder.Reference<MobEffect> GRAVITY_CRUSH = register("gravity_crush", new PunishmentMobEffect(0x352052));
 	public static final Holder.Reference<MobEffect> INVENTORY_PANIC = registerDisplayOnly("inventory_panic", 0xC06D2E);
 	public static final Holder.Reference<MobEffect> BLIND_HUNT = registerDisplayOnly("blind_hunt", 0x2A2438);
 	public static final Holder.Reference<MobEffect> RANDOM_TELEPORT_TRAP = registerDisplayOnly("random_teleport_trap", 0x6C4CD6);
@@ -54,6 +54,9 @@ public final class ModMobEffects {
 	public static final Holder.Reference<MobEffect> WEAK_HANDS = register("weak_hands", new PunishmentMobEffect(0x777170));
 	public static final Holder.Reference<MobEffect> LAVA_CORRUPTION = register("lava_corruption", new PunishmentMobEffect(0xE65320));
 	public static final Holder.Reference<MobEffect> VOID_CRACK = register("void_crack", new PunishmentMobEffect(0x3B245E));
+	public static final Holder.Reference<MobEffect> REVERSE_CONTROL = register("reverse_control", new PunishmentMobEffect(0x8C43D6));
+	public static final Holder.Reference<MobEffect> ITEM_DROP_CURSE = register("item_drop_curse", new PunishmentMobEffect(0xBB2727));
+	public static final Holder.Reference<MobEffect> INVENTORY_LOCK = register("inventory_lock", new PunishmentMobEffect(0x651A20));
 
 	private ModMobEffects() {
 	}

@@ -14,8 +14,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 
 public class GlassCannonEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 120 * 20;
-
 	@Override
 	public String getId() {
 		return "glass_cannon";
@@ -38,7 +36,7 @@ public class GlassCannonEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -48,10 +46,11 @@ public class GlassCannonEvent implements RandomEvent {
 		}
 
 		PlayerEventComponent component = RandomSurvivalEventsComponents.PLAYER_EVENTS.get(player);
-		component.setGlassCannonUntilTick(world.getGameTime() + DURATION_TICKS);
+		int durationTicks = getDefaultEventDurationTicks();
+		component.setGlassCannonUntilTick(world.getGameTime() + durationTicks);
 		AttributeEventHelper.applyMaxHealthModifier(player, AttributeEventIds.GLASS_CANNON, -6.0D);
-		player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, DURATION_TICKS, 0));
-		player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, DURATION_TICKS, 0));
+		player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, durationTicks, 0));
+		player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, durationTicks, 0));
 		RandomEventUtils.sendMessage(player, "你变得更危险，也更脆弱了。");
 	}
 }

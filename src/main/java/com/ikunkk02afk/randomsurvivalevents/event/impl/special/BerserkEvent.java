@@ -10,8 +10,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 
 public class BerserkEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 30 * 20;
-
 	@Override
 	public String getId() {
 		return "berserk";
@@ -34,7 +32,7 @@ public class BerserkEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -43,9 +41,10 @@ public class BerserkEvent implements RandomEvent {
 			return;
 		}
 
-		player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, DURATION_TICKS, 0));
-		player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, DURATION_TICKS, 0));
-		player.addEffect(new MobEffectInstance(MobEffects.HUNGER, DURATION_TICKS, 0));
+		int durationTicks = getDefaultEventDurationTicks();
+		player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, durationTicks, 0));
+		player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, durationTicks, 0));
+		player.addEffect(new MobEffectInstance(MobEffects.HUNGER, durationTicks, 0));
 		RandomEventUtils.sendMessage(player, "你感觉自己像失控了一样。");
 	}
 }

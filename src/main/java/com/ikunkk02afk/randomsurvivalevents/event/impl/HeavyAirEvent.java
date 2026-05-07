@@ -11,8 +11,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 
 public class HeavyAirEvent implements RandomEvent {
-	private static final int DURATION_TICKS = 15 * 20;
-
 	@Override
 	public String getId() {
 		return "heavy_air";
@@ -35,7 +33,7 @@ public class HeavyAirEvent implements RandomEvent {
 
 	@Override
 	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
-		return DURATION_TICKS;
+		return getDefaultEventDurationTicks();
 	}
 
 	@Override
@@ -44,7 +42,7 @@ public class HeavyAirEvent implements RandomEvent {
 			return;
 		}
 
-		player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, DURATION_TICKS, 0));
+		player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, getDefaultEventDurationTicks(), 0));
 		RandomEventUtils.playSound(world, player.blockPosition(), SoundEvents.AMBIENT_CAVE.value(), 0.9F, 0.55F);
 		RandomEventUtils.sendMessage(player, "空气突然变重了。");
 	}

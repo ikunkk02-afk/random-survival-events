@@ -34,5 +34,8 @@
   "effect.random-survival-events.lava_corruption": "岩浆侵蚀",
   "effect.random-survival-events.void_crack": "虚空裂缝",
   "effect.random-survival-events.block_chaos": "方块异变",
-  "effect.random-survival-events.recipe_chaos": "配方混乱"
+  "effect.random-survival-events.recipe_chaos": "配方混乱",
+  "effect.random-survival-events.reverse_control": "方向错乱",
+  "effect.random-survival-events.item_drop_curse": "手滑诅咒",
+  "effect.random-survival-events.inventory_lock": "背包封锁"
 }
