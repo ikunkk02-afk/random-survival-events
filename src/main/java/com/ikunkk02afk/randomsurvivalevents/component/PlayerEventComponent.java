@@ -8,6 +8,7 @@ public class PlayerEventComponent implements ComponentV3 {
 	private long maxHealthBoostUntilTick;
 	private long maxHealthReduceUntilTick;
 	private long glassCannonUntilTick;
+	private long healthDebtUntilTick;
 
 	public long getMaxHealthBoostUntilTick() {
 		return maxHealthBoostUntilTick;
@@ -33,11 +34,20 @@ public class PlayerEventComponent implements ComponentV3 {
 		this.glassCannonUntilTick = glassCannonUntilTick;
 	}
 
+	public long getHealthDebtUntilTick() {
+		return healthDebtUntilTick;
+	}
+
+	public void setHealthDebtUntilTick(long healthDebtUntilTick) {
+		this.healthDebtUntilTick = healthDebtUntilTick;
+	}
+
 	@Override
 	public void readFromNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
 		maxHealthBoostUntilTick = tag.getLong("MaxHealthBoostUntilTick");
 		maxHealthReduceUntilTick = tag.getLong("MaxHealthReduceUntilTick");
 		glassCannonUntilTick = tag.getLong("GlassCannonUntilTick");
+		healthDebtUntilTick = tag.getLong("HealthDebtUntilTick");
 	}
 
 	@Override
@@ -45,5 +55,6 @@ public class PlayerEventComponent implements ComponentV3 {
 		tag.putLong("MaxHealthBoostUntilTick", maxHealthBoostUntilTick);
 		tag.putLong("MaxHealthReduceUntilTick", maxHealthReduceUntilTick);
 		tag.putLong("GlassCannonUntilTick", glassCannonUntilTick);
+		tag.putLong("HealthDebtUntilTick", healthDebtUntilTick);
 	}
 }

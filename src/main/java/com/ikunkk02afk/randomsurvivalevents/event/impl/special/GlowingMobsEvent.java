@@ -2,6 +2,7 @@ package com.ikunkk02afk.randomsurvivalevents.event.impl.special;
 
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventCategory;
+import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,6 +14,8 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.phys.AABB;
 
 public class GlowingMobsEvent implements RandomEvent {
+	private static final int DURATION_TICKS = 20 * 20;
+
 	@Override
 	public String getId() {
 		return "glowing_mobs";
@@ -29,6 +32,16 @@ public class GlowingMobsEvent implements RandomEvent {
 	}
 
 	@Override
+	public RandomEventRarity getRarity() {
+		return RandomEventRarity.UNCOMMON;
+	}
+
+	@Override
+	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
+		return DURATION_TICKS;
+	}
+
+	@Override
 	public void execute(ServerPlayer player, ServerLevel world) {
 		if (player == null || world == null || !player.isAlive()) {
 			return;
@@ -37,7 +50,7 @@ public class GlowingMobsEvent implements RandomEvent {
 		AABB box = player.getBoundingBox().inflate(16.0D);
 		int affected = 0;
 		for (Entity entity : world.getEntities(player, box, entity -> entity instanceof LivingEntity && entity instanceof Enemy)) {
-			((LivingEntity) entity).addEffect(new MobEffectInstance(MobEffects.GLOWING, 20 * 20, 0));
+			((LivingEntity) entity).addEffect(new MobEffectInstance(MobEffects.GLOWING, DURATION_TICKS, 0));
 			affected++;
 		}
 

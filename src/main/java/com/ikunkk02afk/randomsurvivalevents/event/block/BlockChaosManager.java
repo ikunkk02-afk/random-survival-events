@@ -3,6 +3,8 @@ package com.ikunkk02afk.randomsurvivalevents.event.block;
 import com.ikunkk02afk.randomsurvivalevents.config.RandomSurvivalEventsConfig;
 import com.ikunkk02afk.randomsurvivalevents.effect.ModMobEffects;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventUtils;
+import com.ikunkk02afk.randomsurvivalevents.event.punishment.DestructiveModeRules;
+import com.ikunkk02afk.randomsurvivalevents.event.punishment.PunishmentEntityTags;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,6 +20,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -120,7 +123,10 @@ public final class BlockChaosManager {
 		}
 
 		RandomSurvivalEventsConfig config = RandomSurvivalEventsConfig.get();
-		if (!config.enableBlockChaosEffect || !canTrigger(serverPlayer) || !serverPlayer.hasEffect(ModMobEffects.BLOCK_CHAOS)) {
+		if (!config.enableBlockChaosEffect
+				|| !config.enableBlockChaosEvents
+				|| !canTrigger(serverPlayer)
+				|| !serverPlayer.hasEffect(ModMobEffects.BLOCK_CHAOS)) {
 			return;
 		}
 
@@ -158,17 +164,24 @@ public final class BlockChaosManager {
 
 		EntityType<?> entityType = selectMobType(config);
 		Entity entity = entityType.spawn(world, spawnPos.get(), MobSpawnType.TRIGGERED);
+		if (entity instanceof Creeper && !DestructiveModeRules.canUsePermanentMobDisaster(config)) {
+			entity.addTag(PunishmentEntityTags.NO_BLOCK_DAMAGE_CREEPER);
+		}
 		if (entity != null && isBossWarningMob(entityType)) {
 			RandomEventUtils.sendMessage(player, "傻愣着干嘛？还不赶紧跑。");
 		}
 	}
 
 	private static EntityType<?> selectMobType(RandomSurvivalEventsConfig config) {
-		if (RANDOM.nextDouble() >= config.blockChaosDangerousMobChance) {
+		if (RANDOM.nextDouble() >= config.dangerousMobChance) {
 			return COMMON_MOBS[RANDOM.nextInt(COMMON_MOBS.length)];
 		}
 
-		EntityType<?>[] dangerousPool = config.allowBossMobFromBlockChaos ? DANGEROUS_MOBS : DANGEROUS_MOBS_WITHOUT_BOSSES;
+		boolean allowBosses = config.allowBossMobFromBlockChaos
+				&& config.allowExtremeMobs
+				&& config.allowBossMobs
+				&& DestructiveModeRules.canUsePermanentMobDisaster(config);
+		EntityType<?>[] dangerousPool = allowBosses ? DANGEROUS_MOBS : DANGEROUS_MOBS_WITHOUT_BOSSES;
 		return dangerousPool[RANDOM.nextInt(dangerousPool.length)];
 	}
 

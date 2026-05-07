@@ -7,5 +7,6 @@ public enum RandomEventCategory {
 	ATTRIBUTE,
 	SPECIAL,
 	MOB,
-	WEATHER
+	WEATHER,
+	PUNISHMENT
 }

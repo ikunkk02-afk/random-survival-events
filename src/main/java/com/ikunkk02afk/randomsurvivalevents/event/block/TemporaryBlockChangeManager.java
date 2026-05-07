@@ -3,6 +3,7 @@ package com.ikunkk02afk.randomsurvivalevents.event.block;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -18,7 +19,33 @@ public final class TemporaryBlockChangeManager {
 	}
 
 	public static void add(ServerLevel world, BlockPos pos, BlockState originalState, long expireTick) {
-		CHANGES.add(new TemporaryBlockChange(world.dimension(), pos.immutable(), originalState, expireTick));
+		if (world == null || pos == null || originalState == null) {
+			return;
+		}
+
+		add(world, pos, originalState, world.getBlockState(pos), expireTick);
+	}
+
+	public static void add(ServerLevel world, BlockPos pos, BlockState originalState, BlockState replacementState, long expireTick) {
+		if (world == null || pos == null || originalState == null || replacementState == null) {
+			return;
+		}
+
+		removePendingChange(world.dimension(), pos);
+		CHANGES.add(new TemporaryBlockChange(
+				world.dimension(),
+				pos.immutable(),
+				originalState,
+				replacementState,
+				expireTick
+		));
+	}
+
+	public static boolean hasPendingChange(ServerLevel world, BlockPos pos) {
+		if (world == null || pos == null) {
+			return false;
+		}
+		return CHANGES.stream().anyMatch(change -> change.dimension().equals(world.dimension()) && change.pos().equals(pos));
 	}
 
 	public static void tick(MinecraftServer server) {
@@ -30,14 +57,57 @@ public final class TemporaryBlockChangeManager {
 				continue;
 			}
 
-			BlockState currentState = world.getBlockState(change.pos());
-			if (currentState.is(Blocks.SLIME_BLOCK)) {
-				world.setBlockAndUpdate(change.pos(), change.originalState());
-			}
+			restore(world, change);
 			iterator.remove();
 		}
 	}
 
-	private record TemporaryBlockChange(ResourceKey<Level> dimension, BlockPos pos, BlockState originalState, long expireTick) {
+	public static void restoreAll(MinecraftServer server) {
+		if (server == null) {
+			CHANGES.clear();
+			return;
+		}
+
+		for (TemporaryBlockChange change : List.copyOf(CHANGES)) {
+			ServerLevel world = server.getLevel(change.dimension());
+			if (world != null) {
+				restore(world, change);
+			}
+		}
+		CHANGES.clear();
+	}
+
+	private static void restore(ServerLevel world, TemporaryBlockChange change) {
+		if (world.getBlockEntity(change.pos()) != null) {
+			return;
+		}
+
+		BlockState currentState = world.getBlockState(change.pos());
+		if (shouldRestore(currentState, change.replacementState())) {
+			world.setBlockAndUpdate(change.pos(), change.originalState());
+		}
+	}
+
+	private static boolean shouldRestore(BlockState currentState, BlockState replacementState) {
+		if (currentState.isAir() && replacementState.isAir()) {
+			return true;
+		}
+		if (currentState.is(Blocks.LAVA) && replacementState.is(Blocks.LAVA)) {
+			return true;
+		}
+		return currentState.is(replacementState.getBlock()) && Objects.equals(currentState.getFluidState(), replacementState.getFluidState());
+	}
+
+	private static void removePendingChange(ResourceKey<Level> dimension, BlockPos pos) {
+		CHANGES.removeIf(change -> change.dimension().equals(dimension) && change.pos().equals(pos));
+	}
+
+	private record TemporaryBlockChange(
+			ResourceKey<Level> dimension,
+			BlockPos pos,
+			BlockState originalState,
+			BlockState replacementState,
+			long expireTick
+	) {
 	}
 }

@@ -14,6 +14,7 @@ public final class PlayerEventStateManager {
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			if (!player.isAlive()) {
 				AttributeEventHelper.removeAll(player);
+				RandomSurvivalEventsComponents.PLAYER_EVENTS.get(player).setHealthDebtUntilTick(0L);
 				continue;
 			}
 
@@ -22,6 +23,7 @@ public final class PlayerEventStateManager {
 			tickMaxHealthBoost(player, component, gameTime);
 			tickMaxHealthReduce(player, component, gameTime);
 			tickGlassCannon(player, component, gameTime);
+			tickHealthDebt(player, component, gameTime);
 		}
 	}
 
@@ -54,6 +56,16 @@ public final class PlayerEventStateManager {
 			player.removeEffect(MobEffects.DAMAGE_BOOST);
 			player.removeEffect(MobEffects.MOVEMENT_SPEED);
 			component.setGlassCannonUntilTick(0L);
+		}
+	}
+
+	private static void tickHealthDebt(ServerPlayer player, PlayerEventComponent component, long gameTime) {
+		long untilTick = component.getHealthDebtUntilTick();
+		if (untilTick > gameTime) {
+			AttributeEventHelper.ensureMaxHealthModifier(player, AttributeEventIds.HEALTH_DEBT, -6.0D);
+		} else if (untilTick > 0L) {
+			AttributeEventHelper.removeMaxHealthModifier(player, AttributeEventIds.HEALTH_DEBT);
+			component.setHealthDebtUntilTick(0L);
 		}
 	}
 }

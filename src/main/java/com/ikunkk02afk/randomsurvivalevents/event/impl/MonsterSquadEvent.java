@@ -2,6 +2,7 @@ package com.ikunkk02afk.randomsurvivalevents.event.impl;
 
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventCategory;
+import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventUtils;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,11 @@ public class MonsterSquadEvent implements RandomEvent {
 	@Override
 	public RandomEventCategory getCategory() {
 		return RandomEventCategory.MOB;
+	}
+
+	@Override
+	public RandomEventRarity getRarity() {
+		return RandomEventRarity.UNCOMMON;
 	}
 
 	@Override

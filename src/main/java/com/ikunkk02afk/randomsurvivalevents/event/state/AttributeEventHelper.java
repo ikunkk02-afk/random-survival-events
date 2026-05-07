@@ -45,6 +45,7 @@ public final class AttributeEventHelper {
 		removeMaxHealthModifier(player, AttributeEventIds.MAX_HEALTH_BOOST);
 		removeMaxHealthModifier(player, AttributeEventIds.MAX_HEALTH_REDUCE);
 		removeMaxHealthModifier(player, AttributeEventIds.GLASS_CANNON);
+		removeMaxHealthModifier(player, AttributeEventIds.HEALTH_DEBT);
 	}
 
 	private static void clampHealth(ServerPlayer player) {

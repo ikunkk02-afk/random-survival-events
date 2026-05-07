@@ -9,6 +9,7 @@ import com.ikunkk02afk.randomsurvivalevents.event.block.BlockChaosManager;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventManager;
 import com.ikunkk02afk.randomsurvivalevents.event.EventStateTicker;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventTicker;
+import com.ikunkk02afk.randomsurvivalevents.event.punishment.MiningLockManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,7 @@ public class RandomSurvivalEvents implements ModInitializer {
 		ModMobEffects.register();
 		RandomEventManager.initialize();
 		BlockChaosManager.register();
+		MiningLockManager.register();
 		RandomEventTicker.register();
 		EventStateTicker.register();
 		RandomSurvivalEventsCommands.register();

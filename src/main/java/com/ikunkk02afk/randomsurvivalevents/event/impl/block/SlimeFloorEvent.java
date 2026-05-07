@@ -3,6 +3,7 @@ package com.ikunkk02afk.randomsurvivalevents.event.impl.block;
 import com.ikunkk02afk.randomsurvivalevents.config.RandomSurvivalEventsConfig;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventCategory;
+import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventUtils;
 import com.ikunkk02afk.randomsurvivalevents.event.block.TemporaryBlockChangeManager;
 import net.minecraft.core.BlockPos;
@@ -12,6 +13,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SlimeFloorEvent implements RandomEvent {
+	private static final int DURATION_TICKS = 60 * 20;
+
 	@Override
 	public String getId() {
 		return "slime_floor";
@@ -25,6 +28,16 @@ public class SlimeFloorEvent implements RandomEvent {
 	@Override
 	public RandomEventCategory getCategory() {
 		return RandomEventCategory.BLOCK;
+	}
+
+	@Override
+	public RandomEventRarity getRarity() {
+		return RandomEventRarity.UNCOMMON;
+	}
+
+	@Override
+	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
+		return DURATION_TICKS;
 	}
 
 	@Override
@@ -44,7 +57,7 @@ public class SlimeFloorEvent implements RandomEvent {
 				}
 
 				world.setBlockAndUpdate(pos, Blocks.SLIME_BLOCK.defaultBlockState());
-				TemporaryBlockChangeManager.add(world, pos, originalState, world.getGameTime() + 60L * 20L);
+				TemporaryBlockChangeManager.add(world, pos, originalState, world.getGameTime() + DURATION_TICKS);
 				changed++;
 			}
 		}

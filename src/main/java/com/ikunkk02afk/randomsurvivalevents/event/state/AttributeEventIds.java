@@ -7,6 +7,7 @@ public final class AttributeEventIds {
 	public static final ResourceLocation MAX_HEALTH_BOOST = id("max_health_boost");
 	public static final ResourceLocation MAX_HEALTH_REDUCE = id("max_health_reduce");
 	public static final ResourceLocation GLASS_CANNON = id("glass_cannon");
+	public static final ResourceLocation HEALTH_DEBT = id("health_debt");
 
 	private AttributeEventIds() {
 	}

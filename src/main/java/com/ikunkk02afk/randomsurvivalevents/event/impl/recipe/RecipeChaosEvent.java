@@ -3,6 +3,7 @@ package com.ikunkk02afk.randomsurvivalevents.event.impl.recipe;
 import com.ikunkk02afk.randomsurvivalevents.config.RandomSurvivalEventsConfig;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventCategory;
+import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
 import com.ikunkk02afk.randomsurvivalevents.recipechaos.RecipeShuffleManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,6 +22,21 @@ public class RecipeChaosEvent implements RandomEvent {
 	@Override
 	public RandomEventCategory getCategory() {
 		return RandomEventCategory.RECIPE;
+	}
+
+	@Override
+	public RandomEventRarity getRarity() {
+		return RandomEventRarity.RARE;
+	}
+
+	@Override
+	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
+		return RandomSurvivalEventsConfig.get().recipeShuffleDurationTicks;
+	}
+
+	@Override
+	public boolean managesStatusEffect() {
+		return true;
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package com.ikunkk02afk.randomsurvivalevents.event.impl;
 
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventCategory;
+import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventUtils;
 import java.util.Random;
 import net.minecraft.server.level.ServerLevel;
@@ -28,6 +29,11 @@ public class BarrageJudgementEvent implements RandomEvent {
 	@Override
 	public RandomEventCategory getCategory() {
 		return RandomEventCategory.SPECIAL;
+	}
+
+	@Override
+	public RandomEventRarity getRarity() {
+		return RandomEventRarity.COMMON;
 	}
 
 	@Override

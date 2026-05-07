@@ -2,6 +2,7 @@ package com.ikunkk02afk.randomsurvivalevents.event.impl;
 
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventCategory;
+import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventUtils;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
@@ -25,6 +26,11 @@ public class MiniLightningEvent implements RandomEvent {
 	@Override
 	public RandomEventCategory getCategory() {
 		return RandomEventCategory.WEATHER;
+	}
+
+	@Override
+	public RandomEventRarity getRarity() {
+		return RandomEventRarity.UNCOMMON;
 	}
 
 	@Override

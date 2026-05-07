@@ -2,6 +2,7 @@ package com.ikunkk02afk.randomsurvivalevents.event.impl;
 
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventCategory;
+import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventUtils;
 import java.util.Optional;
 import java.util.Random;
@@ -35,6 +36,11 @@ public class AirDropEvent implements RandomEvent {
 	@Override
 	public RandomEventCategory getCategory() {
 		return RandomEventCategory.PLAYER;
+	}
+
+	@Override
+	public RandomEventRarity getRarity() {
+		return RandomEventRarity.COMMON;
 	}
 
 	@Override

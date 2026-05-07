@@ -3,6 +3,7 @@
 	"package": "com.ikunkk02afk.randomsurvivalevents.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"CreeperExplosionMixin",
 		"CraftingMenuMixin",
 		"ExampleMixin",
 		"RecipeResultSlotMixin",

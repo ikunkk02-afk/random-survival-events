@@ -2,6 +2,7 @@ package com.ikunkk02afk.randomsurvivalevents.event.impl;
 
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEvent;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventCategory;
+import com.ikunkk02afk.randomsurvivalevents.event.RandomEventRarity;
 import com.ikunkk02afk.randomsurvivalevents.event.RandomEventUtils;
 import java.util.Random;
 import net.minecraft.server.level.ServerLevel;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.Items;
 
 public class LuckyBlessingEvent implements RandomEvent {
 	private static final Random RANDOM = new Random();
+	private static final int DURATION_TICKS = 20 * 20;
 	private static final Item[] REWARDS = {
 			Items.GOLD_NUGGET,
 			Items.EXPERIENCE_BOTTLE,
@@ -37,12 +39,22 @@ public class LuckyBlessingEvent implements RandomEvent {
 	}
 
 	@Override
+	public RandomEventRarity getRarity() {
+		return RandomEventRarity.COMMON;
+	}
+
+	@Override
+	public int getStatusEffectDurationTicks(ServerPlayer player, ServerLevel world) {
+		return DURATION_TICKS;
+	}
+
+	@Override
 	public void execute(ServerPlayer player, ServerLevel world) {
 		if (player == null || world == null || !player.isAlive()) {
 			return;
 		}
 
-		player.addEffect(new MobEffectInstance(MobEffects.LUCK, 20 * 20, 0));
+		player.addEffect(new MobEffectInstance(MobEffects.LUCK, DURATION_TICKS, 0));
 		Item reward = REWARDS[RANDOM.nextInt(REWARDS.length)];
 		RandomEventUtils.dropItem(world, player.blockPosition(), new ItemStack(reward, getRewardCount(reward)));
 		RandomEventUtils.sendMessage(player, "你感觉今天的运气有点离谱。");
